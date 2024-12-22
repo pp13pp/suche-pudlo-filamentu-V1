@@ -27,7 +27,7 @@ unsigned long currentMillis; //czas w ms
 
 float temp, wilgoc; //średnie temp i wilgoci z obu czujników
 int PWM=90; //ile procent wypełnienia na wentylatory
-int PWM1=140; ///PWM 1/3 mocy zasilacza
+int PWM1=125; ///PWM 1/3 mocy zasilacza
 int obrot=1; 
 int licznik=0;
 
@@ -160,12 +160,12 @@ digitalWrite(R2pin, LOW);
 digitalWrite(R3pin, LOW); 
 }
 ///----------------------mieszanie powietrza w środku
-if(obrot==50){
+if(obrot==20){
 analogWrite(M13pin, 200);
 delay(200);
 analogWrite(M13pin, PWM);
 }
-else if (obrot==70)
+else if (obrot==30)
 {digitalWrite(M13pin, LOW); 
   obrot=1;
 }
