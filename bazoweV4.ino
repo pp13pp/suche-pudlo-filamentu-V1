@@ -25,10 +25,12 @@ uint8_t rows;      // Rows per line.
 int czas=0;   //czas pracy od uruchomienia
 unsigned long currentMillis; //czas w ms
 float temp, wilgoc; //średnie temp i wilgoci z obu czujników
+
 int PWM=200; //wypełnienie na wentylatory 0 - 255
 int PWM1=180;  // wypełnienie dla dwóch grzałek na raz
 int obrot=1; 
 
+///////-----------------------------------------------------
 void setup() {
 
 pinMode(R1pin, OUTPUT);
@@ -94,10 +96,18 @@ void clearValue(uint8_t row) {
 void loop() {
 currentMillis = millis();
 czas=(currentMillis/3600000);
+
+
+/////////// wyłącz PWM
+
+digitalWrite(R1pin, LOW);    
+digitalWrite(R2pin, LOW);    
+digitalWrite(R3pin, LOW);    
+ 
  //////////////
    sensors_event_t humidity1, temp1;
   aht1.getEvent(&humidity1, &temp1);// populate temp and humidity objects with fresh data
-Serial.print("Temperature1: "); Serial.print(temp1.temperature); Serial.println(" C");
+  Serial.print("Temperature1: "); Serial.print(temp1.temperature); Serial.println(" C");
   Serial.print("Humidity1: "); Serial.print(humidity1.relative_humidity); Serial.println("% rH");
   Serial.println("");
  
@@ -106,7 +116,6 @@ Serial.print("Temperature1: "); Serial.print(temp1.temperature); Serial.println(
   Serial.print("Temperature2: "); Serial.print(temp2.temperature); Serial.println(" C");
   Serial.print("Humidity2: "); Serial.print(humidity2.relative_humidity); Serial.println("% rH");
  
-
 ///////////////
 temp=(temp1.temperature+temp2.temperature)/2;
 wilgoc=(humidity1.relative_humidity+humidity2.relative_humidity)/2;
@@ -117,18 +126,20 @@ wilgoc=(humidity1.relative_humidity+humidity2.relative_humidity)/2;
   oled.print(wilgoc, 1);
   clearValue(2*rows);
   oled.print(czas);  
+
 //////////////regulacja temperatury (<60) i wilgotności (<10)
+
 if(wilgoc>10){
 if(temp<58){
  
 if (obrot==2){
-analogWrite(R1pin, 0);    
+//analogWrite(R1pin, 0);    
 
 analogWrite(R2pin,PWM1);
 analogWrite(R3pin,PWM1);
 }
 else  if (obrot==3){
-analogWrite(R2pin, 0);    
+//analogWrite(R2pin, 0);    
 
 analogWrite(R3pin,PWM1);
 analogWrite(R1pin,PWM1);
@@ -136,14 +147,17 @@ analogWrite(R1pin,PWM1);
  else 
  {
 obrot=1;
-analogWrite(R3pin, 0);    
+//analogWrite(R3pin, 0);    
 
 analogWrite(R1pin,PWM1);
 analogWrite(R2pin,PWM1);
- 
-}
+ }
  delay(500);
- obrot=obrot+1;
+obrot=obrot+1;
+Serial.println("");
+Serial.print("obrot ");
+Serial.println(obrot);
+Serial.println("");
 }
 else
 {
@@ -158,6 +172,8 @@ digitalWrite(R1pin, LOW);
 digitalWrite(R2pin, LOW); 
 digitalWrite(R3pin, LOW); 
 }
+//obrot=obrot+1;
+
 /////////////
 analogWrite(M13pin, PWM);
 /////////////wentylacja równająca wilgotność
